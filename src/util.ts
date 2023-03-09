@@ -125,6 +125,8 @@ export function UploadPackage(apiurl:string, filename: string, project: any, jwt
 				fileid: "",
 				language: "nodejs",
 				daemon: false,
+				chrome: false,
+				chromium: false,
 				author: project.author, main: project.main, _type: "package"};
 
 			if(project.main != null) {
@@ -161,6 +163,16 @@ export function UploadPackage(apiurl:string, filename: string, project: any, jwt
 						pro.daemon = true;
 					} else if(project.openiap.daemon == false || project.openiap.daemon == "false") {
 						pro.daemon = true;
+					}
+					if(project.openiap.chrome == true || project.openiap.chrome == "true") {
+						pro.chrome = true;
+					} else if(project.openiap.chrome == false || project.openiap.chrome == "false") {
+						pro.chrome = true;
+					}
+					if(project.openiap.chromium == true || project.openiap.chromium == "true") {
+						pro.chromium = true;
+					} else if(project.openiap.chromium == false || project.openiap.chromium == "false") {
+						pro.chromium = true;
 					}
 				}
 				var result = await client.UploadFile({filename: filename})
