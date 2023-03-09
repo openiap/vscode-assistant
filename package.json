@@ -1,0 +1,83 @@
+{
+  "name": "openiap-assistent",
+  "displayName": "OpenIAP assistent",
+  "description": "Helper commands for working with OpenIAP flow",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.76.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "publisher": "openiap",
+  "contributes": {
+    "commands": [
+      {
+        "command": "openiap.addflowconfig",
+        "title": "Add openiap flow instance"
+      },
+      {
+        "command": "openiap.deleteflowconfig",
+        "title": "Delete openiap flow instance"
+      },
+      {
+        "command": "openiap.packproject",
+        "title": "Pack for openiap upload"
+      },
+      {
+        "command": "openiap.pushproject",
+        "title": "Pack and publish to openiap intance"
+      }
+    ],
+    "configuration": [
+      {
+        "id": "openiap",
+        "title": "OpenIAP",
+        "properties": {
+          "openiap.flow.credentials": {
+            "type": "array",
+            "default": false,
+            "description": "List of know openiap flow instances",
+            "scope": "window",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "compose": "vsce publish --pre-release",
+    "release": "vsce publish",
+    "updateapidev": "npm uninstall @openiap/nodeapi && npm i openiap/nodeapi",
+    "updateapi": "npm uninstall @openiap/nodeapi && npm i @openiap/nodeapi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openiap/vscode-assistent.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "author": "OpenIAP ApS / Allan Zimmermann",
+  "license": "MPL-2.0",
+  "bugs": {
+    "url": "https://community.openiap.io/"
+  },
+  "homepage": "https://github.com/open-rpa/openflow",
+  "funding": "https://github.com/sponsors/skadefro",
+  "devDependencies": {
+    "@types/node": "16.x",
+    "@types/vscode": "^1.76.0",
+    "typescript": "^4.9.5"
+  },
+  "dependencies": {
+    "@openiap/nodeapi": "github:openiap/nodeapi"
+  }
+}
