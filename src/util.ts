@@ -124,6 +124,7 @@ export function UploadPackage(apiurl:string, filename: string, project: any, jwt
 				version: project.version, 
 				fileid: "",
 				language: "nodejs",
+				daemon: false,
 				author: project.author, main: project.main, _type: "package"};
 
 			if(project.main != null) {
@@ -150,11 +151,18 @@ export function UploadPackage(apiurl:string, filename: string, project: any, jwt
 				pro = await client.InsertOne({ collectionname: "agents", item: pro });
 			} else {
 				pro = projects[0];
-			}			
+			}
 			if(pro != null) {
 				pro.id = project.name;
 				pro.description = project.description;
 				pro.version = project.version;
+				if(project != null && project.openiap != null) {
+					if(project.openiap.daemon == true || project.openiap.daemon == "true") {
+						pro.daemon = true;
+					} else if(project.openiap.daemon == false || project.openiap.daemon == "false") {
+						pro.daemon = true;
+					}
+				}
 				var result = await client.UploadFile({filename: filename})
 				fs.unlinkSync(filename);
 				pro.fileid = result.id;
