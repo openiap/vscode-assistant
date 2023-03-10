@@ -117,7 +117,7 @@ export async function addflowconfig() {
                 }
                 if(protocol.label != 'ws:' && protocol.label != 'wss:' && protocol.label != 'http:' && protocol.label != 'https:') {
                     port = ":80"
-                    if(prot = "https:") {
+                    if(prot == "https:") {
                         port = ":443"
                     }
                 } else if (protocol.label == 'ws:' || protocol.label == 'wss:'){

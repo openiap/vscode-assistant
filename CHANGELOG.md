@@ -6,3 +6,4 @@ Initial release of vs code extension for easily creating openflow agent code or 
 
 - Fix detecting dotnet projects
 - Initial release
+- Fix error when using non secure apiurl after choosing grpc
