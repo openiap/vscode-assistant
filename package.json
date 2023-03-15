@@ -2,14 +2,17 @@
   "name": "openiap-assistent",
   "displayName": "OpenIAP assistent",
   "description": "Helper commands for working with OpenIAP flow",
-  "version": "0.0.7",
+  "preview": true,
+  "version": "0.0.8",
   "icon": "logo.png",
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
+    "build": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "compose": "vsce publish --pre-release",
     "release": "vsce publish",
+    "pack": "vsce package",
     "updateapidev": "npm uninstall @openiap/nodeapi && npm i openiap/nodeapi",
     "updateapi": "npm uninstall @openiap/nodeapi && npm i @openiap/nodeapi"
   },
@@ -79,6 +82,6 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@openiap/nodeapi": "github:openiap/nodeapi"
+    "@openiap/nodeapi": "^0.0.4"
   }
 }

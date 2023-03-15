@@ -1,0 +1,6 @@
+make
+node_modules
+**/*.vsix
+.vscode
+src
+tsconfig.json

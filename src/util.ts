@@ -156,6 +156,8 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 				pro = projects[0];
 			}
 			if (pro != null) {
+				if (outputChannel == null) outputChannel = vscode.window.createOutputChannel('openiap');
+				outputChannel.append(JSON.stringify(project, null, 2));
 				pro.id = project.name;
 				pro.description = project.description;
 				pro.version = project.version;

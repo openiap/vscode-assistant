@@ -1,3 +1,4 @@
 /out
 /make
 /node_modules
+*.vsix

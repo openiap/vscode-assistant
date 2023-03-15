@@ -262,7 +262,9 @@ export async function pushproject() {
         vscode.window.showErrorMessage(`No package.json found in workspace, please run npm init first`);
         return;
     }
-    var project = require(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json');
+    // var project = require(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json');
+    var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', 'utf8');
+    var project = JSON.parse(json);
     
     var filename = await pack()
     if(filename == "") {
