@@ -51,13 +51,17 @@ export async function addflowconfig() {
             if(apidomain.startsWith('grpc.')) {
                 webdomain = apidomain.substring(5);
             }
-            var credentials = vscode.workspace.getConfiguration().get<flowCrendentials[]>('openiap.flow.credentials');
-            if(credentials == undefined || credentials.length == 0) credentials = [];
-            var exists = credentials.find(x => x.apidomain == apidomain);
-            if(exists != undefined) {
-                if(!await InputConfirm(input, "Flow configuration already exists, do you want to overwrite it?")) {
-                    return
+            try {
+                var credentials = vscode.workspace.getConfiguration().get<flowCrendentials[]>('openiap.flow.credentials');
+                if(credentials == undefined || credentials.length == 0) credentials = [];
+                var exists = credentials.find(x => x.apidomain == apidomain);
+                if(exists != undefined) {
+                    if(!await InputConfirm(input, "Flow configuration already exists, do you want to overwrite it?")) {
+                        return
+                    }
                 }
+            } catch (error) {
+                console.error(error);                
             }
 
             let jwt:string = "";
@@ -137,8 +141,16 @@ export async function addflowconfig() {
                 vscode.window.showErrorMessage('Failed to get user');
                 return;
             }
-            credentials = credentials.filter(x => x.webdomain != webdomain);
-            credentials.push({apiurl, apidomain, webdomain, jwt});
+            try {
+                if(credentials != null) {
+                    credentials = credentials.filter(x => x.webdomain != webdomain);
+                    credentials.push({apiurl, apidomain, webdomain, jwt});
+                } else {
+                    credentials = [{apiurl, apidomain, webdomain, jwt}]
+                }
+            } catch (error) {
+                credentials = [{apiurl, apidomain, webdomain, jwt}]                
+            }
             await vscode.workspace.getConfiguration().update('openiap.flow.credentials', credentials, vscode.ConfigurationTarget.Global);
             vscode.window.showInformationMessage(`Added new flow configuration for ${apidomain}`);
         } catch (error: any) {
@@ -176,7 +188,8 @@ async function InputConfirm(input: MultiStepInput, message: string): Promise<boo
 export async function deleteflowconfig() {
     MultiStepInput.run(async input => {
         var credentials = vscode.workspace.getConfiguration().get<flowCrendentials[]>('openiap.flow.credentials');
-        if(credentials == null) {
+        // @ts-ignore
+        if(credentials == null || credentials.length == 0 || credentials == false) {
             vscode.window.showInformationMessage(`No configurations found`);
             return;
         }
@@ -233,7 +246,8 @@ export async function packproject() {
 }
 export async function pushproject() {
     var credentials = vscode.workspace.getConfiguration().get<flowCrendentials[]>('openiap.flow.credentials');
-    if(credentials == undefined || credentials.length == 0) credentials = [];
+    // @ts-ignore
+    if(credentials == undefined || credentials.length == 0 || credentials == false) credentials = [];
     if(credentials.length == 0) {
         vscode.window.showErrorMessage(`No configurations found`);
         return;
