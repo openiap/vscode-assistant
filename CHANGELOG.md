@@ -10,3 +10,4 @@ Initial release of vs code extension for easily creating openflow agent code or 
 - Fix project settings not getting populated to openflow
 - Fix issue with getting updates to package.json
 - Fix issues with empty comfig / update for windows
+- Close after getting user, update api

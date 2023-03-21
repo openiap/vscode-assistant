@@ -99,8 +99,9 @@ export function RequestUserToken(apiurl: string) {
 }
 export function GetUser(apiurl: string, jwt: string) {
 	return new Promise<User>(async (resolve, reject) => {
+		var client:openiap = null as any;
 		try {
-			var client = new openiap(apiurl, jwt);
+			client = new openiap(apiurl, jwt);
 			var user = await client.connect();
 			if (user != null) {
 				resolve(user);
@@ -108,6 +109,14 @@ export function GetUser(apiurl: string, jwt: string) {
 			reject(new Error("User not found"));
 		} catch (error) {
 			reject(error);
+		}
+		finally {
+			if(client != null) {
+				try {
+					client.Close();
+				} catch (error) {
+				}
+			}
 		}
 	});
 }
