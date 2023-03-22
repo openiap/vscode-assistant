@@ -3,7 +3,7 @@
   "displayName": "OpenIAP assistent",
   "description": "Helper commands for working with OpenIAP flow",
   "preview": true,
-  "version": "0.0.11",
+  "version": "0.0.13",
   "icon": "logo.png",
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -42,6 +42,18 @@
       {
         "command": "openiap.pushproject",
         "title": "Pack and publish to openiap intance"
+      },
+      {
+        "command": "openiap.initproject",
+        "title": "Initialize project, ensure package.json and launch.json exists for openiap instance"
+      },
+      {
+        "command": "openiap.addpackageconfig",
+        "title": "Add openiap settings for package.json"
+      },
+      {
+        "command": "openiap.addlaunchconfig",
+        "title": "Add example configuration to launch.json for openiap instance"
       }
     ],
     "configuration": [
@@ -82,6 +94,7 @@
     "typescript": "^4.9.5"
   },
   "dependencies": {
-    "@openiap/nodeapi": "^0.0.8"
+    "@openiap/nodeapi": "^0.0.8",
+    "json5": "^2.2.3"
   }
 }
