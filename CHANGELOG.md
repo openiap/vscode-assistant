@@ -2,6 +2,8 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.18]
+ - Compare on name not webdomain when adding new config
 ## [0.0.17]
  - Hide password doing add openiap instance
 ## [0.0.16]

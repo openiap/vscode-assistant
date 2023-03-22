@@ -147,7 +147,7 @@ export async function addflowconfig() {
             var name = apidomain + " (" + username + ")";
             try {
                 if (credentials != null) {
-                    credentials = credentials.filter(x => x.webdomain != webdomain);
+                    credentials = credentials.filter(x => x.name != name);
                     credentials.push({ apiurl, apidomain, webdomain, jwt, name, username });
                 } else {
                     credentials = [{ apiurl, apidomain, webdomain, jwt, name, username }]
