@@ -42,6 +42,7 @@ export async function addflowconfig() {
                 title: "Add Flow Configuration",
                 step: 2,
                 totalSteps: 3,
+                password: false,
                 value: apidomain,
                 prompt: 'Enter API domain',
                 validate: async (value) => {
@@ -67,6 +68,7 @@ export async function addflowconfig() {
                 step: 3,
                 totalSteps: 3,
                 value: '',
+                password: false,
                 prompt: 'Enter Username, or leave empty to login using browser',
                 validate: async (value) => {
                     // if(value == '') return 'Username is required';
@@ -119,6 +121,7 @@ export async function addflowconfig() {
                     step: 2,
                     totalSteps: 2,
                     value: '',
+                    password: true,
                     prompt: 'Enter Password',
                     validate: async (value) => {
                         if (value == '') return 'Password is required';

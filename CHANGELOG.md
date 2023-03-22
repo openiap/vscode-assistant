@@ -2,6 +2,8 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.17]
+ - Hide password doing add openiap instance
 ## [0.0.16]
  - Add example files on empty project
  - Improve language detection
