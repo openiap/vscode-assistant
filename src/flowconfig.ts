@@ -305,6 +305,60 @@ export async function addpackageconfig() {
 export async function _addpackageconfig(credentials: flowCrendentials | null) {
     if (credentials == null) return;
 
+
+    // is workspace empty ?
+    var _files = fs.readdirSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath as string);
+    if (_files.length == 0) {
+        fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.py', `import openiap, asyncio
+from openiap import Client
+async def __wait_for_message(cli:Client, message, payload):
+    workitem = await cli.PopWorkitem("testq")
+    if workitem != None:
+        workitem.state = "successful"
+        cli.UpdateWorkitem(workitem, None, True)
+async def onconnected(cli:Client):
+    try:
+        await cli.Signin()
+        print("Connected to OpenIAP") 
+        queuename = await cli.RegisterQueue("", __wait_for_message)
+        print(f"Consuming queue {queuename}")
+        result = await cli.Query(collectionname="entities", projection={"_created": 1, "name": 1, "_type": 1})
+        print(result)
+        
+    except Exception as e:
+        print(e)
+    # cli.Close()
+async def main():
+    client = openiap.Client()
+    client.onconnected = onconnected
+    await asyncio.sleep(2)
+    while client.connected:
+        await asyncio.sleep(1)
+asyncio.run(main())`);
+        fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `const { openiap } = require("@openiap/nodeapi");
+async function main() {
+    var client = new openiap();
+    await client.connect();
+    var localqueue = await client.RegisterQueue({ queuename:""}, async (msg, payload, user, jwt)=> {
+        var wi = await client.PopWorkitem({"wiq": "testq"});
+        if(wi == null) {
+            console.log("No workitem found");
+            return;
+        }
+        // simulate work
+        await new Promise(resolve => { setTimeout(resolve, 5000) });
+        wi.state = "successful";
+        await client.UpdateWorkitem({workitem: wi});
+        console.log("Updated workitem");
+    })
+    console.log("listening on " + localqueue);
+    var result = await client.Query({query: {}, projection: {"_created":1, "name":1}, top:5})
+    console.log(JSON.stringify(result, null, 2))
+}
+main();`);
+    }
+
+
     var json = `{
         "name": "",
         "version": "0.0.1",
@@ -318,30 +372,42 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
     if (fs.existsSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json') == true) {
         json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', 'utf8');
     }
+        
     // get workspace's parent folder name 
     var parentname = vscode.workspace.workspaceFolders?.[0].uri.fsPath.split("/").pop();
 
     var project = JSON5.parse(json);
-    // search project for .js or .ts files
-    var files = await vscode.workspace.findFiles('**/*.js', '**/node_modules/**');
-    if (files.length == 0) {
-        files = await vscode.workspace.findFiles('**/*.ts', '**/node_modules/**');
-    }
-    if (files.length > 0) {
-        var name = files[0].fsPath.split("/").pop();
-        if (name != undefined) {
-            project.main = name;
-        }
-    } else {
-        files = await vscode.workspace.findFiles('**/*.py', '**/node_modules/**');
-        if (files.length > 0) {
-            var name = files[0].fsPath.split("/").pop();
-            if (name != undefined) {
-                project.main = name;
+    if (project.openiap == null) project.openiap = {};
+    if((project.main == null || project.main == "") || (project.openiap.language == null || project.openiap.language == "") ) {
+        var files = await vscode.workspace.findFiles('**/*.ts', '**/node_modules/**');
+        if (files.length == 0) {
+            files = await vscode.workspace.findFiles('**/*.js', '**/node_modules/**');
+            if (files.length > 0) {
+                project.openiap.language = "nodejs";
+                project.openiap.typescript = false;
             }
         } else {
-            project.main = "main.js";
-            fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `// Please add your code here\nconsole.log('Hello World');`);
+            project.openiap.language = "nodejs";
+            project.openiap.typescript = true;
+        }
+        if (files.length == 0) {
+            files = await vscode.workspace.findFiles('**/*.py', '**/node_modules/**');
+            if (files.length > 0) project.openiap.language = "python";
+        } 
+        if (files.length == 0) {
+            files = await vscode.workspace.findFiles('**/*.csproj', '**/node_modules/**');
+            if (files.length > 0) project.openiap.language = "dotnet";
+        }
+        if (files.length == 0) {
+            files = await vscode.workspace.findFiles('**/*.vbproj', '**/node_modules/**');
+            if (files.length > 0) project.openiap.language = "dotnet";
+        }
+        if (files.length > 0 && (project.main == null || project.main == "")) {
+            var name:string = files[0].fsPath.replace(vscode.workspace.workspaceFolders?.[0].uri.fsPath as any, "");
+            if(name.startsWith("/") || name.startsWith("\\")) name = name.substring(1);
+            if (project.openiap.language != "dotnet") {
+                project.main = name;
+            }
         }
     }
     var updateapi = false;
@@ -367,7 +433,6 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
             }
         }
     }
-    if (project.openiap == null) project.openiap = {};
     if (project.openiap.daemon == null) project.openiap.daemon = false;
     if (project.openiap.chromium == null) project.openiap.chromium = false;
     fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', JSON.stringify(project, null, 4));
@@ -379,8 +444,8 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
 export async function initproject() {
     var credentials = await userSelectConfiguration();
     if (credentials == null) return;
-    _addpackageconfig(credentials)
-    _addlaunchconfig(credentials)
+    await _addpackageconfig(credentials)
+    await _addlaunchconfig(credentials)
     vscode.window.showInformationMessage(`Project initialised, please edit package.json to your needs`);
 
 }
@@ -405,19 +470,49 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
             fs.mkdirSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode');
         }
         if (fs.existsSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/launch.json') == false) {
-            fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/launch.json', `{
-                "version": "0.2.0",
-                "configurations": [
-                    {
-                        "name": "Python: Current File",
-                        "type": "python",
-                        "request": "launch",
-                        "program": "${project.main}",
-                        "console": "integratedTerminal",
-                    }
+            var _files = fs.readdirSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath as string);
+            if(_files.indexOf('main.py') > 0 && _files.indexOf('main.js') > 0) {
+                fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/launch.json', `{
+                    "version": "0.2.0",
+                    "configurations": [
+                        {
+                            "type": "node",
+                            "request": "launch",
+                            "name": "NodeJS: Run main.js",
+                            "skipFiles": [
+                                "<node_internals>/**"
+                            ],
+                            "program": "\${workspaceFolder}/main.js",
+                            "console": "integratedTerminal",
+                            "env": {
+                                "apiurl": "${credentials.apiurl}",
+                                "jwt": "${credentials.jwt}"
+                        
+                            }
+                        },
+                        {
+                            "name": "Python: Run main.pyt",
+                            "type": "python",
+                            "request": "launch",
+                            "program": "main.py",
+                            "console": "integratedTerminal",
+                            "env": {
+                                "apiurl": "${credentials.apiurl}",
+                                "jwt": "${credentials.jwt}"
+                        
+                            }
+                        }
+                    ]
+                }`);
+            } else {
+                fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/launch.json', `{
+                    "version": "0.2.0",
+                    "configurations": [
+                    ]
+                }`);
+            }
 
-                ]
-            }`);
+
         }
         var configuration: any = null;
         var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/launch.json', 'utf8');
@@ -427,52 +522,81 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
                 configuration = launch.configurations[i];
             }
         }
+        if(configuration == null && launch.configurations.length == 1) configuration = launch.configurations[0];
         if(configuration == null) {
-            if (project.main.indexOf(".py") > 0) {
+            if (project.openiap.language == "python") {
                 configuration = {
-                    "name": "Python: Current File",
+                    "name": "Python: Run "+ project.main,
                     "type": "python",
                     "request": "launch",
                     "program": project.main,
                     "console": "integratedTerminal",
                 };
                 launch.configurations.push(configuration);
-            } else if (project.main.indexOf(".js") > 0) {
-                configuration = {
-                    "type": "node",
-                    "request": "launch",
-                    "name": "Launch Program",
-                    "skipFiles": [
-                        "<node_internals>/**"
-                    ],
-                    "program": `\${workspaceFolder}/${project.main}`,
-                    "console": "integratedTerminal",
-                };
+            } else if (project.openiap.language == "nodejs") {
+                if(project.openiap.typescript == true && project.main.endsWith(".ts")) {
+                    configuration =         {
+                        "type": "node",
+                        "request": "launch",
+                        "name": "TypeScript: Run " + project.main,
+                        "runtimeArgs": [
+                            "--loader",
+                            "ts-node/esm"
+                        ],
+                        "skipFiles": [
+                            "<node_internals>/**"
+                        ],
+                        "program": `\${workspaceFolder}/${project.main}`,
+                        "console": "integratedTerminal"
+                    }
+                    // not needed anymore
+                    // var files = await vscode.workspace.findFiles('**/nodemon.json', '**/node_modules/**');
+                    // if(files.length == 0) {
+                    //     fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/nodemon.json', `{
+                    //         "execMap": {
+                    //             "ts": "ts-node"
+                    //         }
+                    //     }`);
+                    // }
+                } else {
+                    configuration = {
+                        "type": "node",
+                        "request": "launch",
+                        "name": "NodeJS: Run " + project.main,
+                        "skipFiles": [
+                            "<node_internals>/**"
+                        ],
+                        "program": `\${workspaceFolder}/${project.main}`,
+                        "console": "integratedTerminal",
+                    };
+                }
                 launch.configurations.push(configuration);
-            } else {
+            } else if (project.openiap.language == "dotnet") {
                 configuration = {
-                    "name": ".NET Core Launch (console)",
+                    "name": ".NET Core Launch ${project.name}",
                     "type": "coreclr",
                     "request": "launch",
                     "preLaunchTask": "build",
-                    "program": "${workspaceFolder}/bin/Debug/net6.0/dotnetworkitemagent.dll",
-                    "console": "internalConsole",
+                    "program": `\${workspaceFolder}/bin/Debug/net6.0/${project.name}.dll`,
+                    "console": "integratedTerminal",
                     "stopAtEntry": false,
                     "cwd": "${workspaceFolder}",
                 };
                 launch.configurations.push(configuration);
             }
         }
+        if(configuration == null) {
+            vscode.window.showInformationMessage(`Error adding launch.json`);
+            return;
+        }
         if(configuration.env == null) configuration.env = {};
         configuration.env.apiurl = credentials.apiurl;
         configuration.env.jwt = credentials.jwt;
-        if(configuration.env.wiq == null) {
-            if(project.main.indexOf(".js") > 0) {
-                configuration.env.wiq = "nodeagent"
-            } else if(project.main.indexOf(".py") > 0) {
-                configuration.env.wiq = "pyagent"
-            } else {
-                configuration.env.wiq = "dotnetagent"
+        for(var i = 0; i < launch.configurations.length; i++) {
+            var conf = launch.configurations[i];
+            if(conf != null&& conf.env != null && conf.env.apiurl != null && conf.env.jwt != null) {
+                conf.env.apiurl = credentials.apiurl;
+                conf.env.jwt = credentials.jwt;
             }
         }
         fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/launch.json', JSON.stringify(launch, null, 4));

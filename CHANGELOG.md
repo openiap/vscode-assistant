@@ -2,6 +2,11 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.16]
+ - Add example files on empty project
+ - Improve language detection
+ - Improve launch.json generation
+
 ## [0.0.15]
  - Fix error with always updating project.json name
 
