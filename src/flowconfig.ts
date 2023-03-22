@@ -318,6 +318,9 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
     if (fs.existsSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json') == true) {
         json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', 'utf8');
     }
+    // get workspace's parent folder name 
+    var parentname = vscode.workspace.workspaceFolders?.[0].uri.fsPath.split("/").pop();
+
     var project = JSON5.parse(json);
     // search project for .js or .ts files
     var files = await vscode.workspace.findFiles('**/*.js', '**/node_modules/**');
@@ -327,7 +330,6 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
     if (files.length > 0) {
         var name = files[0].fsPath.split("/").pop();
         if (name != undefined) {
-            if(project.name != "" && project.name != null) project.name = name.replace(".js", "").replace(".ts", "");
             project.main = name;
         }
     } else {
@@ -335,7 +337,6 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
         if (files.length > 0) {
             var name = files[0].fsPath.split("/").pop();
             if (name != undefined) {
-                if(project.name != "" && project.name != null) project.name = name.replace(".py", "");
                 project.main = name;
             }
         } else {
@@ -344,6 +345,7 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
         }
     }
     var updateapi = false;
+    if (project.name == "" || project.name == null) project.name = parentname;
     if (project.main.indexOf(".js") > 0) {
         if (project.scripts == null) project.scripts = {};
         if (project.scripts.updateapi == null) {

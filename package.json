@@ -12,6 +12,7 @@
     "watch": "tsc -watch -p ./",
     "compose": "vsce publish --pre-release",
     "release": "vsce publish",
+    "latest": "vsce publish",
     "pack": "vsce package",
     "updateapidev": "npm uninstall @openiap/nodeapi && npm i openiap/nodeapi",
     "updateapi": "npm uninstall @openiap/nodeapi && npm i @openiap/nodeapi"

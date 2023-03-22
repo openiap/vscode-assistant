@@ -2,7 +2,15 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
-## [Unreleased]
+## [0.0.15]
+ - Fix error with always updating project.json name
+
+## [0.0.14]
+- Add option to create/update package.json and launch.json
+- Fix issues with creating openiap instance's with username
+- Add name to openiap instance based of apiurl and username
+
+## [0.0.13]
 
 - Fix detecting dotnet projects
 - Initial release
