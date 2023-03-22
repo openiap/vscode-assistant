@@ -306,7 +306,7 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
     if (credentials == null) return;
 
     var json = `{
-        "name": "exampleagent",
+        "name": "",
         "version": "0.0.1",
         "description": "Example agent, please change",
         "main": "main.js",
@@ -327,7 +327,7 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
     if (files.length > 0) {
         var name = files[0].fsPath.split("/").pop();
         if (name != undefined) {
-            project.name = name.replace(".js", "").replace(".ts", "");
+            if(project.name != "" && project.name != null) project.name = name.replace(".js", "").replace(".ts", "");
             project.main = name;
         }
     } else {
@@ -335,7 +335,7 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
         if (files.length > 0) {
             var name = files[0].fsPath.split("/").pop();
             if (name != undefined) {
-                project.name = name.replace(".py", "");
+                if(project.name != "" && project.name != null) project.name = name.replace(".py", "");
                 project.main = name;
             }
         } else {

@@ -3,7 +3,7 @@
   "displayName": "OpenIAP assistent",
   "description": "Helper commands for working with OpenIAP flow",
   "preview": true,
-  "version": "0.0.13",
+  "version": "0.0.14",
   "icon": "logo.png",
   "scripts": {
     "vscode:prepublish": "npm run compile",
