@@ -2,6 +2,9 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.20]
+ - on init in emtpy project, detect if npm and python installed before adding examples
+ - on init in emtpy project, also run pip install if python example was added
 ## [0.0.19]
  - Keep dialog open while adding new connection if tabbing away
  - fix username/password with special charecters

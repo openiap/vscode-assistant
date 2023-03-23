@@ -1,9 +1,11 @@
+import { execSync } from 'child_process';
 import * as vscode from 'vscode';
 import { MultiStepInput } from './multiStepInput';
 import { GetUser, RequestUserToken, runCommandInOutputWindow, UploadPackage } from './util';
 import * as path from 'path';
 import * as fs from 'fs';
 const JSON5 = require('json5')
+
 
 const protocols = [{ label: 'grpc:' }, { label: 'ws:' }, { label: 'wss:' }, { label: 'pipe:' }, { label: 'socket:' }, { label: 'http:' }, { label: 'https:' }]
 const yesno = [{ label: 'Yes' }, { label: 'No' }]
@@ -243,7 +245,8 @@ async function pack(): Promise<string> {
         return "";
     }
     var name = project.name.replace("/", "-").replace("@", "") + "-" + project.version;
-    await runCommandInOutputWindow(['pack'], workspaceFolder.uri.fsPath);
+    var cmd = findNPMPath();
+    if(cmd != "" && cmd != null) await runCommandInOutputWindow(cmd, ['pack'], workspaceFolder.uri.fsPath);
     return path.join(workspaceFolder.uri.fsPath, name + '.tgz');
 }
 export async function packproject() {
@@ -314,10 +317,16 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
     if (credentials == null) return;
 
 
+    var pipinstall = false;
     // is workspace empty ?
     var _files = fs.readdirSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath as string);
     if (_files.length == 0) {
-        fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.py', `import openiap, asyncio
+        var pythonpath = findPythonPath();
+        var nodepath = findNodePath();
+        var npmpath = findNodePath();
+        if(pythonpath != "") {
+            pipinstall = true;
+            fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.py', `import openiap, asyncio
 from openiap import Client
 async def __wait_for_message(cli:Client, message, payload):
     workitem = await cli.PopWorkitem("testq")
@@ -343,7 +352,9 @@ async def main():
     while client.connected:
         await asyncio.sleep(1)
 asyncio.run(main())`);
-        fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `const { openiap } = require("@openiap/nodeapi");
+        }
+        if(nodepath != "" && npmpath != "") {
+            fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `const { openiap } = require("@openiap/nodeapi");
 async function main() {
     var client = new openiap();
     await client.connect();
@@ -364,8 +375,8 @@ async function main() {
     console.log(JSON.stringify(result, null, 2))
 }
 main();`);
+        }
     }
-
 
     var json = `{
         "name": "",
@@ -446,7 +457,12 @@ main();`);
     fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', JSON.stringify(project, null, 4));
 
     if (updateapi) {
-        await runCommandInOutputWindow(['run updateapi'], vscode.workspace.workspaceFolders?.[0].uri.fsPath);
+        var cmd = findNPMPath();
+        if(cmd != "" && cmd != null) await runCommandInOutputWindow(cmd, ['run updateapi'], vscode.workspace.workspaceFolders?.[0].uri.fsPath);
+    }
+    if (pipinstall) {
+        var cmd = findPythonPath();
+        if(cmd != "" && cmd != null) await runCommandInOutputWindow(cmd, ['-m pip install openiap'], vscode.workspace.workspaceFolders?.[0].uri.fsPath);
     }
 }
 export async function initproject() {
@@ -614,3 +630,32 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
     }
 }
 
+export function findPythonPath() {
+    return findInPath("python")
+}
+export function findNodePath() {
+    return findInPath("node")
+}
+export function findNPMPath() {
+    return findInPath("npm")
+}
+function findInPath(exec:string):string | null {
+    try {
+        let command;
+        switch (process.platform) {
+            case 'linux':
+            case 'darwin':
+                command = 'which ' + exec;
+                break;
+            case 'win32':
+                command = 'where ' + exec;
+                break;
+            default:
+                throw new Error(`Unsupported platform: ${process.platform}`);
+        }
+        const stdout = execSync(command, { stdio: 'pipe' }).toString();
+        return stdout.trim() || null;
+    } catch (error) {
+        throw error;
+    }
+}

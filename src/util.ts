@@ -219,11 +219,12 @@ interface Process {
 }
 const runningProcesses: Map<number, Process> = new Map();
 let outputChannel: vscode.OutputChannel;
-export function runCommandInOutputWindow(args: string[], cwd: string | undefined): Promise<void> {
+export function runCommandInOutputWindow(command: string, args: string[], cwd: string | undefined): Promise<void> {
 	return new Promise((resolve, reject) => {
 		if (outputChannel == null) outputChannel = vscode.window.createOutputChannel('openiap');
 
-		const cmd = getNpmBin() + ' ' + args.join(' ');
+		// const cmd = getNpmBin() + ' ' + args.join(' ');
+		const cmd = command + ' ' + args.join(' ');
 		const p = cp.exec(cmd, { cwd: cwd, env: process.env });
 
 		runningProcesses.set(p.pid as number, { process: p, cmd: cmd });
