@@ -2,6 +2,9 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.19]
+ - Keep dialog open while adding new connection if tabbing away
+ - fix username/password with special charecters
 ## [0.0.18]
  - Compare on name not webdomain when adding new config
 ## [0.0.17]

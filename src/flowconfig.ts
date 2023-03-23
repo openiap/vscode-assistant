@@ -44,6 +44,7 @@ export async function addflowconfig() {
                 totalSteps: 3,
                 password: false,
                 value: apidomain,
+                ignoreFocusOut: true,
                 prompt: 'Enter API domain',
                 validate: async (value) => {
                     if (value == '') return 'API URL is required';
@@ -69,6 +70,7 @@ export async function addflowconfig() {
                 totalSteps: 3,
                 value: '',
                 password: false,
+                ignoreFocusOut: true,
                 prompt: 'Enter Username, or leave empty to login using browser',
                 validate: async (value) => {
                     // if(value == '') return 'Username is required';
@@ -81,6 +83,22 @@ export async function addflowconfig() {
             let pathname = "";
 
             var prot = "http:"
+            if (username != "") {
+                password = await input.showInputBox({
+                    title: "Add Flow Configuration",
+                    step: 2,
+                    totalSteps: 2,
+                    value: '',
+                    password: true,
+                    ignoreFocusOut: true,
+                    prompt: 'Enter Password',
+                    validate: async (value) => {
+                        if (value == '') return 'Password is required';
+                        return undefined;
+                    },
+                    shouldResume: shouldResume
+                });
+            }
             if (protocol.label != 'ws:' && protocol.label != 'wss:') {
                 if (webdomain == "app.openiap.io") {
                     prot = "https:"
@@ -116,19 +134,6 @@ export async function addflowconfig() {
                 pathname = "/api/v2"
             }
             if (username != "") {
-                password = await input.showInputBox({
-                    title: "Add Flow Configuration",
-                    step: 2,
-                    totalSteps: 2,
-                    value: '',
-                    password: true,
-                    prompt: 'Enter Password',
-                    validate: async (value) => {
-                        if (value == '') return 'Password is required';
-                        return undefined;
-                    },
-                    shouldResume: shouldResume
-                });
             } else {
                 jwt = await RequestUserToken(prot + '//' + webdomain);
             }
