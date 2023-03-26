@@ -2,7 +2,7 @@
   "name": "openiap-assistent",
   "displayName": "OpenIAP assistent",
   "description": "Helper commands for working with OpenIAP flow",
-  "preview": true,
+  "preview": false,
   "version": "0.0.21",
   "icon": "logo.png",
   "scripts": {
