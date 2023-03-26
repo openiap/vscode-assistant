@@ -2,6 +2,8 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.21]
+ - Add port support in project.json/openiap
 ## [0.0.20]
  - on init in emtpy project, detect if npm and python installed before adding examples
  - on init in emtpy project, also run pip install if python example was added

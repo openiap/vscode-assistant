@@ -136,8 +136,11 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 				daemon: false,
 				chrome: false,
 				chromium: false,
+				port: 3000,
 				author: project.author, main: project.main, _type: "package"
 			};
+			// @ts-ignore
+			delete pro.port;
 
 			if (project.main != null) {
 				if (project.main.endsWith(".js") || project.main.endsWith(".ts")) {
@@ -185,6 +188,9 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 						pro.chromium = true;
 					} else if (project.openiap.chromium == false || project.openiap.chromium == "false") {
 						pro.chromium = false;
+					}
+					if(project.openiap.port != null && project.openiap.port != "") {
+						pro.port = parseInt(project.openiap.port);
 					}
 				}
 				var result = await client.UploadFile({ filename: filename })
