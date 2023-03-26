@@ -352,6 +352,7 @@ async def main():
     while client.connected:
         await asyncio.sleep(1)
 asyncio.run(main())`);
+            fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/requirements.txt', `openiap`);
         }
         if(nodepath != "" && npmpath != "") {
             fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `const { openiap } = require("@openiap/nodeapi");
