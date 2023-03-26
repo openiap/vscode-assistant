@@ -356,9 +356,10 @@ asyncio.run(main())`);
         }
         if(nodepath != "" && npmpath != "") {
             fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `const { openiap } = require("@openiap/nodeapi");
-async function main() {
-    var client = new openiap();
-    await client.connect();
+/** 
+ * @param {openiap} client
+ * **/
+async function onConnected(client) {
     var localqueue = await client.RegisterQueue({ queuename:""}, async (msg, payload, user, jwt)=> {
         var wi = await client.PopWorkitem({"wiq": "testq"});
         if(wi == null) {
@@ -375,8 +376,15 @@ async function main() {
     var result = await client.Query({query: {}, projection: {"_created":1, "name":1}, top:5})
     console.log(JSON.stringify(result, null, 2))
 }
+async function main() {
+    var client = new openiap();
+    client.onConnected = onConnected
+    await client.connect();
+}
 main();`);
         }
+        fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.gitignore', `/node_modules`);
+
     }
 
     var json = `{
@@ -536,7 +544,7 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
                     ]
                 }`);
             }
-
+            fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/.gitignore', `launch.json`);
 
         }
         var configuration: any = null;

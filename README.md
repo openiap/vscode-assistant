@@ -10,14 +10,7 @@ Pack and upload packages to openflow
 Add boiler plate code ( comming soon )
 
 # Getting started
-Open the project with the code you want to publish to an openiap flow instance.
-Press F1 to open the palette and search/select "Add openiap flow instance"
-Follow the guide to create a connection to an openiap flow instance to your global settings. This connection can be reused across all projects.
-Next press F1 once more and search/select "Initialize project"
-This will add/update your package.json ( only python and nodejs detection is working right now ) and set a "main" entry point and add the openiap settings.
-If you have more than one openiap flow instance it will prompt for the one to use ( this way you can easily swap between instances using init )
-This will also add/update your .vscode/launch.json file to run you main entry point and add the needed envoirment variables to connect to your select openiap flow instance
-
+See getting started guide at 
 ## Extension Settings
 
 This extension currently have the following settings:
