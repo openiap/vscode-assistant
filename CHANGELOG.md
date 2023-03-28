@@ -3,6 +3,8 @@
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
 
+## [0.0.24]
+ - Fix issue with findinpath function
 ## [0.0.23]
  - add .gitignore for empty projects
 ## [0.0.22]

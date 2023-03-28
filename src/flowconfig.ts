@@ -663,8 +663,9 @@ function findInPath(exec:string):string | null {
                 throw new Error(`Unsupported platform: ${process.platform}`);
         }
         const stdout = execSync(command, { stdio: 'pipe' }).toString();
-        return stdout.trim() || null;
+        return stdout.trim() || "";
     } catch (error) {
-        throw error;
+        return "";
+        // throw error;
     }
 }
