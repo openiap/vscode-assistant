@@ -391,7 +391,7 @@ main();`);
         "name": "",
         "version": "0.0.1",
         "description": "Example agent, please change",
-        "main": "main.js",
+        "main": "",
         "openiap": {
             "daemon": false,
             "chromium": false
@@ -524,7 +524,7 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
                             }
                         },
                         {
-                            "name": "Python: Run main.pyt",
+                            "name": "Python: Run main.py",
                             "type": "python",
                             "request": "launch",
                             "program": "main.py",
