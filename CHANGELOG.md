@@ -2,6 +2,8 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.26]
+ - fix executing when command path contain spaces
 ## [0.0.25]
  - fix python detection with no project.json
 ## [0.0.24]

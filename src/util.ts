@@ -230,6 +230,9 @@ export function runCommandInOutputWindow(command: string, args: string[], cwd: s
 		if (outputChannel == null) outputChannel = vscode.window.createOutputChannel('openiap');
 
 		// const cmd = getNpmBin() + ' ' + args.join(' ');
+		if(!command.startsWith('"')&& command.indexOf(" ")>0) {
+			command = '"'+command+'"';
+		}
 		const cmd = command + ' ' + args.join(' ');
 		const p = cp.exec(cmd, { cwd: cwd, env: process.env });
 
