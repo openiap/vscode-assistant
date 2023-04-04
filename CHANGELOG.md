@@ -2,6 +2,8 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.28]
+ - by pass windows fake python exe
 ## [0.0.27]
  - fix for multiline path
 ## [0.0.26]

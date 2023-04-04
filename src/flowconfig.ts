@@ -663,7 +663,9 @@ function findInPath(exec:string):string | null {
                 throw new Error(`Unsupported platform: ${process.platform}`);
         }
         const stdout = execSync(command, { stdio: 'pipe' }).toString();
-        const lines = stdout.split(/\r?\n/).filter(line => line.trim() !== '');
+        const lines = stdout.split(/\r?\n/).filter(line => line.trim() !== '')
+            .filter(line => line.toLowerCase().indexOf("windowsapps\\python3.exe") == -1)
+            .filter(line => line.toLowerCase().indexOf("windowsapps\\python.exe") == -1);
         if(lines.length > 0)  return lines[0]
         return "";
     } catch (error) {
