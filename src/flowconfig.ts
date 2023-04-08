@@ -4,6 +4,7 @@ import { MultiStepInput } from './multiStepInput';
 import { GetUser, RequestUserToken, runCommandInOutputWindow, UploadPackage } from './util';
 import * as path from 'path';
 import * as fs from 'fs';
+const ctrossspawn = require('cross-spawn');
 const JSON5 = require('json5')
 
 
@@ -640,33 +641,58 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
 }
 
 export function findPythonPath() {
-    return findInPath("python")
+    var result = findInPath("python3")
+    if (result == "") result = findInPath("python")
+    return result;
+}
+export function findDotnetPath() {
+    return findInPath("dotnet")
+}
+export function findXvfbPath() {
+    return findInPath("xvfb-run")
 }
 export function findNodePath() {
     return findInPath("node")
 }
 export function findNPMPath() {
-    return findInPath("npm")
+    const child = (process.platform === 'win32' ? 'npm.cmd' : 'npm')
+    return findInPath(child)
 }
-function findInPath(exec:string):string | null {
+export function findChromiumPath() {
+    var result = findInPath("chromium-browser");
+    if (result == "") result = findInPath("chromium");
+    return result
+}
+export function findChromePath() {
+    var result = findInPath("google-chrome");
+    if (result == "") result = findInPath("chrome");
+    return result
+}
+export function findInPath(exec:string):string | null {
     try {
         let command;
         switch (process.platform) {
             case 'linux':
             case 'darwin':
-                command = 'which ' + exec;
+                command = 'which';
                 break;
             case 'win32':
-                command = 'where ' + exec;
+                command = 'where.exe';
                 break;
             default:
                 throw new Error(`Unsupported platform: ${process.platform}`);
         }
-        const stdout = execSync(command, { stdio: 'pipe' }).toString();
-        const lines = stdout.split(/\r?\n/).filter(line => line.trim() !== '')
-            .filter(line => line.toLowerCase().indexOf("windowsapps\\python3.exe") == -1)
-            .filter(line => line.toLowerCase().indexOf("windowsapps\\python.exe") == -1);
-        if(lines.length > 0)  return lines[0]
+        const result:any = ctrossspawn.sync(command, [exec], { stdio: 'pipe' });
+        if (result.status === 0) {
+            const stdout = result.stdout.toString();
+            const lines = stdout.split(/\r?\n/).filter((line:string) => line.trim() !== '')
+                .filter((line:string) => line.toLowerCase().indexOf("windowsapps\\python3.exe") == -1)
+                .filter((line:string) => line.toLowerCase().indexOf("windowsapps\\python.exe") == -1);
+            if(lines.length > 0)  return lines[0]
+        } else {
+            if(result.stderr != null) console.log(result.stderr.toString());
+            if(result.stdout != null) console.log(result.stdout.toString());
+        }
         return "";
     } catch (error) {
         return "";

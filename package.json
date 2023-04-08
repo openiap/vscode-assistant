@@ -3,7 +3,7 @@
   "displayName": "OpenIAP assistent",
   "description": "Helper commands for working with OpenIAP flow",
   "preview": false,
-  "version": "0.0.28",
+  "version": "0.0.29",
   "icon": "logo.png",
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -96,6 +96,7 @@
   },
   "dependencies": {
     "@openiap/nodeapi": "^0.0.9",
+    "cross-spawn": "^7.0.3",
     "json5": "^2.2.3"
   }
 }
