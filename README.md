@@ -1,4 +1,4 @@
-# openiap assistent
+# openiap assistant
 
 Allows easily creating boiler plate code, generate tokens and publish agent code for openiap flow or testing SDK's
 
