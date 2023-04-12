@@ -2,6 +2,8 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.30]
+ - Update python example
 ## [0.0.29]
  - More fixes for paths on windows
 ## [0.0.28]

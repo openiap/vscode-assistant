@@ -350,7 +350,7 @@ async def main():
     client = openiap.Client()
     client.onconnected = onconnected
     await asyncio.sleep(2)
-    while client.connected:
+    while True:
         await asyncio.sleep(1)
 asyncio.run(main())`);
             fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/requirements.txt', `openiap`);
