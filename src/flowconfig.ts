@@ -351,61 +351,62 @@ export async function _addpackageconfig(credentials: flowCrendentials | null) {
             if(pythonpath != "") {
                 pipinstall = true;
                 fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.py', `import openiap, asyncio
-    from openiap import Client
-    async def __wait_for_message(cli:Client, message, payload):
-        workitem = await cli.PopWorkitem("testq")
-        if workitem != None:
-            workitem.state = "successful"
-            cli.UpdateWorkitem(workitem, None, True)
-    async def onconnected(cli:Client):
-        try:
-            await cli.Signin()
-            print("Connected to OpenIAP") 
-            queuename = await cli.RegisterQueue("", __wait_for_message)
-            print(f"Consuming queue {queuename}")
-            result = await cli.Query(collectionname="entities", projection={"_created": 1, "name": 1, "_type": 1})
-            print(result)
-            
-        except Exception as e:
-            print(e)
-        # cli.Close()
-    async def main():
-        client = openiap.Client()
-        client.onconnected = onconnected
-        await asyncio.sleep(2)
-        while True:
-            await asyncio.sleep(1)
-    asyncio.run(main())`);
+from openiap import Client
+async def __wait_for_message(cli:Client, message, payload):
+    workitem = await cli.PopWorkitem("testq")
+    if workitem != None:
+        workitem.state = "successful"
+        cli.UpdateWorkitem(workitem, None, True)
+async def onconnected(cli:Client):
+    try:
+        await cli.Signin()
+        print("Connected to OpenIAP") 
+        queuename = await cli.RegisterQueue("", __wait_for_message)
+        print(f"Consuming queue {queuename}")
+        result = await cli.Query(collectionname="entities", projection={"_created": 1, "name": 1, "_type": 1})
+        print(result)
+        
+    except Exception as e:
+        print(e)
+    # cli.Close()
+async def main():
+    client = openiap.Client()
+    client.onconnected = onconnected
+    await asyncio.sleep(2)
+    while True:
+        await asyncio.sleep(1)
+asyncio.run(main())`);
                 fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/requirements.txt', `openiap`);
             }
             if(nodepath != "" && npmpath != "") {
-                fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `const { openiap } = require("@openiap/nodeapi");
-    /** 
-     * @param {openiap} client
-     * **/
-    async function onConnected(client) {
-        var localqueue = await client.RegisterQueue({ queuename:""}, async (msg, payload, user, jwt)=> {
-            var wi = await client.PopWorkitem({"wiq": "testq"});
-            if(wi == null) {
-                console.log("No workitem found");
-                return;
-            }
-            // simulate work
-            await new Promise(resolve => { setTimeout(resolve, 5000) });
-            wi.state = "successful";
-            await client.UpdateWorkitem({workitem: wi});
-            console.log("Updated workitem");
-        })
-        console.log("listening on " + localqueue);
-        var result = await client.Query({query: {}, projection: {"_created":1, "name":1}, top:5})
-        console.log(JSON.stringify(result, null, 2))
-    }
-    async function main() {
-        var client = new openiap();
-        client.onConnected = onConnected
-        await client.connect();
-    }
-    main();`);
+                fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/main.js', `// @ts-check
+const { openiap } = require("@openiap/nodeapi");
+/** 
+ * @param {openiap} client
+ * **/
+async function onConnected(client) {
+    var localqueue = await client.RegisterQueue({ queuename:""}, async (msg, payload, user, jwt)=> {
+        var wi = await client.PopWorkitem({"wiq": "testq"});
+        if(wi == null) {
+            console.log("No workitem found");
+            return;
+        }
+        // simulate work
+        await new Promise(resolve => { setTimeout(resolve, 5000) });
+        wi.state = "successful";
+        await client.UpdateWorkitem({workitem: wi});
+        console.log("Updated workitem");
+    })
+    console.log("listening on " + localqueue);
+    var result = await client.Query({query: {}, projection: {"_created":1, "name":1}, top:5})
+    console.log(JSON.stringify(result, null, 2))
+}
+async function main() {
+    var client = new openiap();
+    client.onConnected = onConnected
+    await client.connect();
+}
+main();`);
             }
             fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.gitignore', `/node_modules`);
 
