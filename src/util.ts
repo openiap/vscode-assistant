@@ -225,6 +225,14 @@ interface Process {
 }
 const runningProcesses: Map<number, Process> = new Map();
 let outputChannel: vscode.OutputChannel;
+export function AppendToOutputWindow(message: string) {
+	if (outputChannel == null) outputChannel = vscode.window.createOutputChannel('openiap');
+	outputChannel.append(message);
+}
+export function AppendLineToOutputWindow(message: string) {
+	if (outputChannel == null) outputChannel = vscode.window.createOutputChannel('openiap');
+	outputChannel.append(message);
+}
 export function runCommandInOutputWindow(command: string, args: string[], cwd: string | undefined): Promise<void> {
 	return new Promise((resolve, reject) => {
 		if (outputChannel == null) outputChannel = vscode.window.createOutputChannel('openiap');
@@ -239,20 +247,20 @@ export function runCommandInOutputWindow(command: string, args: string[], cwd: s
 		runningProcesses.set(p.pid as number, { process: p, cmd: cmd });
 		if (p.stderr == null || p.stdout == null) return;
 		p.stderr.on('data', (data: string) => {
-			outputChannel.append(data);
+			AppendToOutputWindow(data);
 		});
 		p.stdout.on('data', (data: string) => {
-			outputChannel.append(data);
+			AppendToOutputWindow(data);
 		});
 		p.on('exit', (_code: number, signal: string) => {
 			runningProcesses.delete(p.pid as number);
 			if (signal === 'SIGTERM') {
-				outputChannel.appendLine('Successfully killed process');
-				outputChannel.appendLine('-----------------------');
-				outputChannel.appendLine('');
+				AppendLineToOutputWindow('Successfully killed process');
+				AppendLineToOutputWindow('-----------------------');
+				AppendLineToOutputWindow('');
 			} else {
-				outputChannel.appendLine('-----------------------');
-				outputChannel.appendLine('');
+				AppendLineToOutputWindow('-----------------------');
+				AppendLineToOutputWindow('');
 			}
 			resolve();
 		});

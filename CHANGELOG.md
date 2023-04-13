@@ -2,6 +2,8 @@
 
 Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
 
+## [0.0.31]
+ - Update api for REST fixes, pipe more info to openiap output window
 ## [0.0.30]
  - Update python example
 ## [0.0.29]
