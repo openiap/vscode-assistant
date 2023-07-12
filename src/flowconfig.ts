@@ -455,6 +455,10 @@ main();`);
                 files = await vscode.workspace.findFiles('**/*.vbproj', '**/node_modules/**');
                 if (files.length > 0) project.openiap.language = "dotnet";
             }
+            if (files.length == 0) {
+                files = await vscode.workspace.findFiles('**/*.ps1', '**/node_modules/**');
+                if (files.length > 0) project.openiap.language = "powershell";
+            } 
             if (files.length > 0 && (project.main == null || project.main == "")) {
                 var name:string = files[0].fsPath.replace(vscode.workspace.workspaceFolders?.[0].uri.fsPath as any, "");
                 if(name.startsWith("/") || name.startsWith("\\")) name = name.substring(1);
@@ -465,7 +469,7 @@ main();`);
         }
         var updateapi = false;
         if (project.name == "" || project.name == null) project.name = parentname;
-        if (project.main.indexOf(".js") > 0) {
+        if (project.main?.indexOf(".js") > 0) {
             if (project.scripts == null) project.scripts = {};
             if (project.scripts.updateapi == null) {
                 project.scripts.updateapi = "npm uninstall @openiap/nodeapi && npm i @openiap/nodeapi"
@@ -476,7 +480,7 @@ main();`);
                 }
 
             }
-        } else if (project.main.indexOf(".py") > 0) {
+        } else if (project.main?.indexOf(".py") > 0) {
             if (fs.existsSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/requirements.txt') == false) {
                 fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/requirements.txt', `openiap`);
             } else {
@@ -580,8 +584,17 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
         var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/.vscode/launch.json', 'utf8');
         var launch = JSON5.parse(json);
         for(var i = 0; i < launch.configurations.length; i++) {
-            if(launch.configurations[i].program.indexOf(project.main) > 0) {
-                configuration = launch.configurations[i];
+            try {
+                if(launch.configurations[i].program == null) continue;
+                if(launch.configurations[i].program.toLowerCase().indexOf(project.main?.toLowerCase()) > 0) {
+                    configuration = launch.configurations[i];
+                } else if(launch.configurations[i].program.toLowerCase().indexOf(`${project.name?.toLowerCase()}.dll`) > 0) {
+                    configuration = launch.configurations[i];
+                } else if(launch.configurations[i].program.toLowerCase().indexOf(`.dll`) > 0) {
+                    configuration = launch.configurations[i];
+                }
+            } catch (error) {
+                console.log(error);
             }
         }
         if(configuration == null && launch.configurations.length == 1) configuration = launch.configurations[0];
@@ -645,6 +658,16 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
                     "cwd": "${workspaceFolder}",
                 };
                 launch.configurations.push(configuration);
+            } else if (project.openiap.language == "powershell") {
+                configuration =        {
+                    "name": "PowerShell: Run ${project.main}",
+                    "type": "PowerShell",
+                    "request": "launch",
+                    "script": project.main,
+                    "args": [],
+                    "cwd": "${file}"
+                };
+                launch.configurations.push(configuration);
             }
         }
         if(configuration == null) {
@@ -656,7 +679,8 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
         configuration.env.jwt = credentials.jwt;
         for(var i = 0; i < launch.configurations.length; i++) {
             var conf = launch.configurations[i];
-            if(conf != null&& conf.env != null && conf.env.apiurl != null && conf.env.jwt != null) {
+            if(conf.program == null) continue;
+            if(conf != null&& conf.env != null && conf.env?.apiurl != null && conf.env?.jwt != null) {
                 conf.env.apiurl = credentials.apiurl;
                 conf.env.jwt = credentials.jwt;
             }

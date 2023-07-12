@@ -149,6 +149,8 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 					pro.language = "python";
 				} else if (project.main.endsWith(".cs") || project.main.endsWith(".vb") || project.main.endsWith(".csproj") || project.main.endsWith(".vbproj")) {
 					pro.language = "dotnet";
+				} else if (project.main.endsWith(".ps1")) {
+					pro.language = "powershell";
 				}
 			} else {
 				// search vscode.workspace for csproj or vbproj file
