@@ -614,6 +614,7 @@ export async function _addlaunchconfig(credentials: flowCrendentials | null) {
                         "type": "node",
                         "request": "launch",
                         "name": "TypeScript: Run " + project.main,
+                        "preLaunchTask": "tsc: build - tsconfig.json",
                         "runtimeArgs": [
                             "--loader",
                             "ts-node/esm"

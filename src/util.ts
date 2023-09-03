@@ -127,7 +127,7 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 			await client.connect();
 			var projects = await client.Query<any>({ collectionname: "agents", query: { "_type": "package", "id": project.name } });
 			var pro = {
-				name: project.name.replace("/", "-").replace("@", " "),
+				name: project.name.replace("/", "-").replace("@", " ").trim(),
 				id: project.name,
 				description: project.description,
 				version: project.version,

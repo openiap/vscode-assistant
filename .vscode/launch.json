@@ -9,6 +9,7 @@
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
             "name": "Launch Extension",
+            "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ],
