@@ -1,7 +1,7 @@
 # Change Log
 
-Initial release of vs code extension for easily creating openflow agent code or working with the SDK's
-
+## [0.0.35]
+ - Add support for package.json just for the npm package, by adding a package.openiap.json file to the root of the project
 ## [0.0.32]
  - Fix issue with default dotnet project, better error handling with init project for updating connection strings
 ## [0.0.31]

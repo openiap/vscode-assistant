@@ -245,7 +245,6 @@ async function pack(): Promise<string> {
         } else {
             vscode.window.showErrorMessage('No package.json found in workspace please run npm init first');
             return "";
-
         }
         if (project.name == undefined) {
             vscode.window.showErrorMessage('No name found in package.json');
@@ -253,7 +252,22 @@ async function pack(): Promise<string> {
         }
         var name = project.name.replace("/", "-").replace("@", "") + "-" + project.version;
         var cmd = findNPMPath();
-        if(cmd != "" && cmd != null) await runCommandInOutputWindow(cmd, ['pack'], workspaceFolder.uri.fsPath);
+        if(cmd != "" && cmd != null) {
+            if (fs.existsSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.openiap.json') == true) {
+                var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.openiap.json', 'utf8');
+                var tempproject = JSON5.parse(json);
+                tempproject.version = project.version;
+                fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.openiap.json', JSON.stringify(tempproject, null, 4));
+
+                fs.copyFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json.bak');
+                fs.copyFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.openiap.json', vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json');
+                await runCommandInOutputWindow(cmd, ['pack'], workspaceFolder.uri.fsPath);
+                fs.copyFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json.bak', vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json');
+                fs.unlinkSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json.bak');
+            } else {
+                await runCommandInOutputWindow(cmd, ['pack'], workspaceFolder.uri.fsPath);
+            }
+        }
         return path.join(workspaceFolder.uri.fsPath, name + '.tgz');
     } catch (error: any) {
         AppendLineToOutputWindow(error.message);
@@ -315,6 +329,11 @@ export async function pushproject() {
         if (credentials == null) return;
         var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', 'utf8');
         var project = JSON5.parse(json);
+        // increase version 
+        var version = project.version.split(".");
+        version[version.length -1 ] = (parseInt(version[version.length -1 ]) + 1).toString();
+        project.version = version.join(".");
+        fs.writeFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', JSON.stringify(project, null, 4));
 
         var filename = await pack()
         if (filename == "") {

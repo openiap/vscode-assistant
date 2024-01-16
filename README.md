@@ -25,9 +25,3 @@ You Command palette and search for "openiap" for a list of commands.
 * `initproject`: Prompts for connection, and then add exmaple package.json and example configuration to launch.json
 * `addpackageconfig`: Add an example configuration package.json
 * `addlaunchconfig`: Prompts for connection if package.json exists, and then add an example configuration to launch.json
-
-
-### 0.0.1
-
-Initial push
-
