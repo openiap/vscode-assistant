@@ -1,5 +1,7 @@
 # Change Log
 
+## [0.0.36]
+ - Add support for ports in package.json
 ## [0.0.35]
  - Add support for package.json just for the npm package, by adding a package.openiap.json file to the root of the project
 ## [0.0.32]

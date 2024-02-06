@@ -136,7 +136,7 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 				daemon: false,
 				chrome: false,
 				chromium: false,
-				port: 3000,
+				ports: [{"port": 3000, "name": "web", "protocol": "TCP", "web": true}],
 				author: project.author, main: project.main, _type: "package"
 			};
 			// @ts-ignore
@@ -191,8 +191,8 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 					} else if (project.openiap.chromium == false || project.openiap.chromium == "false") {
 						pro.chromium = false;
 					}
-					if(project.openiap.port != null && project.openiap.port != "") {
-						pro.port = parseInt(project.openiap.port);
+					if(project.openiap.ports != null && Array.isArray(project.openiap.ports)) {
+						pro.ports = project.openiap.ports;
 					}
 				}
 				var result = await client.UploadFile({ filename: filename })
