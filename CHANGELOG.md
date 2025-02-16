@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.37]
+ - Cleanup commands
+ - Add dynamic template selector for initializing projects
+ - Add support for any language when publishing to openiap
+ - Add "force" new forced re-initilization of project, for fast example switching
+ - We now prefer using .env files over embedding url and tokens in launch.json
 ## [0.0.36]
  - Add support for ports in package.json
 ## [0.0.35]

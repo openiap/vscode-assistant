@@ -3,7 +3,7 @@
   "displayName": "OpenIAP assistant",
   "description": "Helper commands for working with OpenIAP flow",
   "preview": false,
-  "version": "0.0.36",
+  "version": "0.0.37",
   "icon": "logo.png",
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -30,31 +30,27 @@
     "commands": [
       {
         "command": "openiap.addflowconfig",
-        "title": "Add openiap flow instance"
+        "title": "Add openiap/opencore instance"
       },
       {
         "command": "openiap.deleteflowconfig",
-        "title": "Delete openiap flow instance"
+        "title": "Delete openiap/opencore instance"
       },
       {
         "command": "openiap.packproject",
-        "title": "Pack for openiap upload"
+        "title": "Pack for openiap/opencore upload"
       },
       {
         "command": "openiap.pushproject",
-        "title": "Pack and publish to openiap intance"
+        "title": "Pack and publish to openiap/opencore intance"
       },
       {
         "command": "openiap.initproject",
-        "title": "Initialize project, ensure package.json and launch.json exists for openiap instance"
+        "title": "Initialize project, ensure openiap/opencore credentials"
       },
       {
-        "command": "openiap.addpackageconfig",
-        "title": "Add openiap settings for package.json"
-      },
-      {
-        "command": "openiap.addlaunchconfig",
-        "title": "Add example configuration to launch.json for openiap instance"
+        "command": "openiap.initprojectforce",
+        "title": "Force re-initializing project, ensure openiap/opencore credentials"
       }
     ],
     "configuration": [
@@ -96,7 +92,7 @@
     "vsce": "^2.15.0"
   },
   "dependencies": {
-    "@openiap/nodeapi": "^0.0.37",
+    "@openiap/nodeapi": "^0.0.39",
     "cross-spawn": "^7.0.3",
     "json5": "^2.2.3"
   }

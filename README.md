@@ -22,6 +22,5 @@ You Command palette and search for "openiap" for a list of commands.
 * `deleteflowconfig`: Remove an existing connection to openflow
 * `packproject`: Creates tar file with current project in root of workspace
 * `pushproject`: Prompts for connection, create and uploads tar file and then cleans up
-* `initproject`: Prompts for connection, and then add exmaple package.json and example configuration to launch.json
-* `addpackageconfig`: Add an example configuration package.json
-* `addlaunchconfig`: Prompts for connection if package.json exists, and then add an example configuration to launch.json
+* `initproject`: Prompts for connection, if folder is empty, prompts example, then ensures credentials are set
+* `initprojectforce`: Prompts for connection, prompts example, then ensures credentials are set, overwrites existing files

@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { QuickPickItem, window, Disposable, CancellationToken, QuickInputButton, QuickInput, ExtensionContext, QuickInputButtons, Uri } from 'vscode';
+import { Disposable, QuickInput, QuickInputButton, QuickInputButtons, QuickPickItem, window } from 'vscode';
 
 // -------------------------------------------------------
 // Helper code that wraps the API for the multi-step case.

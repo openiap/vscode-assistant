@@ -1,11 +1,11 @@
-import * as vscode from 'vscode';
+import { openiap, User } from '@openiap/nodeapi';
+import * as cp from 'child_process';
+const ctrossspawn = require('cross-spawn');
+import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
-import { openiap, User } from '@openiap/nodeapi';
+import * as vscode from 'vscode';
 import { Uri } from 'vscode';
-import * as cp from 'child_process';
-import * as path from 'path';
-import * as fs from 'fs';
 const JSON5 = require('json5')
 
 export function get(url: string): Promise<string> {
@@ -100,7 +100,7 @@ export function RequestUserToken(apiurl: string) {
 }
 export function GetUser(apiurl: string, jwt: string) {
 	return new Promise<User>(async (resolve, reject) => {
-		var client:openiap = null as any;
+		var client: openiap = null as any;
 		try {
 			client = new openiap(apiurl, jwt);
 			var user = await client.connect();
@@ -112,7 +112,7 @@ export function GetUser(apiurl: string, jwt: string) {
 			reject(error);
 		}
 		finally {
-			if(client != null) {
+			if (client != null) {
 				try {
 					client.Close();
 				} catch (error) {
@@ -120,6 +120,18 @@ export function GetUser(apiurl: string, jwt: string) {
 			}
 		}
 	});
+}
+export async function getGitAPI() {
+	const gitExtension = vscode.extensions.getExtension('vscode.git');
+	if (!gitExtension) {
+		vscode.window.showErrorMessage('Git extension not found.');
+		return;
+	}
+
+	// Activate the extension if it isn't already
+	const git = gitExtension.isActive ? gitExtension.exports : await gitExtension.activate();
+	const gitApi = git.getAPI(1); // version 1 of the API
+	return gitApi;
 }
 export function UploadPackage(apiurl: string, filename: string, project: any, jwt: string) {
 	return new Promise<string>(async (resolve, reject) => {
@@ -129,23 +141,23 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 			if (fs.existsSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json') == true) {
 				var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', 'utf8');
 				localproject = JSON5.parse(json);
-				if(localproject.name == null || localproject.name == "") {
+				if (localproject.name == null || localproject.name == "") {
 					vscode.window.showErrorMessage('No name found in package.json');
 					return "";
 				}
-				if(localproject.name.indexOf("\\") > 0) {
+				if (localproject.name.indexOf("\\") > 0) {
 					vscode.window.showErrorMessage('Name in project.json cannot contain \\');
 					return "";
 				}
-				if(localproject.main == null || localproject.main == "") {
+				if (localproject.main == null || localproject.main == "") {
 					vscode.window.showErrorMessage('No main found in package.json');
 					return "";
 				}
-				if(localproject.openiap == null) {
+				if (localproject.openiap == null) {
 					vscode.window.showErrorMessage('No openiap section found in package.json');
 					return "";
 				}
-				if(localproject.openiap.language == null || localproject.openiap.language == "") {
+				if (localproject.openiap.language == null || localproject.openiap.language == "") {
 					vscode.window.showErrorMessage('No language found in openiap section of package.json');
 					return "";
 				}
@@ -165,7 +177,7 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 				daemon: false,
 				chrome: false,
 				chromium: false,
-				ports: [{"port": 3000, "name": "web", "protocol": "TCP", "web": true}],
+				ports: [{ "port": 3000, "name": "web", "protocol": "TCP", "web": true }],
 				author: project.author, main: project.main, _type: "package"
 			};
 			// @ts-ignore
@@ -197,7 +209,7 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 					} else if (project.openiap.chromium == false || project.openiap.chromium == "false") {
 						pro.chromium = false;
 					}
-					if(project.openiap.ports != null && Array.isArray(project.openiap.ports)) {
+					if (project.openiap.ports != null && Array.isArray(project.openiap.ports)) {
 						pro.ports = project.openiap.ports;
 					}
 				}
@@ -227,6 +239,44 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 		}
 	});
 }
+export function findNodePath() {
+    return findInPath("node")
+}
+export function findNPMPath() {
+    const child = (process.platform === 'win32' ? 'npm.cmd' : 'npm')
+    return findInPath(child)
+}
+export function findInPath(exec: string): string | null {
+    try {
+        let command;
+        switch (process.platform) {
+            case 'linux':
+            case 'darwin':
+                command = 'which';
+                break;
+            case 'win32':
+                command = 'where.exe';
+                break;
+            default:
+                throw new Error(`Unsupported platform: ${process.platform}`);
+        }
+        const result: any = ctrossspawn.sync(command, [exec], { stdio: 'pipe' });
+        if (result.status === 0) {
+            const stdout = result.stdout.toString();
+            const lines = stdout.split(/\r?\n/).filter((line: string) => line.trim() !== '')
+                .filter((line: string) => line.toLowerCase().indexOf("windowsapps\\python3.exe") == -1)
+                .filter((line: string) => line.toLowerCase().indexOf("windowsapps\\python.exe") == -1);
+            if (lines.length > 0) return lines[0]
+        } else {
+            if (result.stderr != null) console.log(result.stderr.toString());
+            if (result.stdout != null) console.log(result.stdout.toString());
+        }
+        return "";
+    } catch (error) {
+        return "";
+        // throw error;
+    }
+}
 interface Process {
 	process: cp.ChildProcess;
 	cmd: string;
@@ -246,8 +296,8 @@ export function runCommandInOutputWindow(command: string, args: string[], cwd: s
 		if (outputChannel == null) outputChannel = vscode.window.createOutputChannel('openiap');
 
 		// const cmd = getNpmBin() + ' ' + args.join(' ');
-		if(!command.startsWith('"')&& command.indexOf(" ")>0) {
-			command = '"'+command+'"';
+		if (!command.startsWith('"') && command.indexOf(" ") > 0) {
+			command = '"' + command + '"';
 		}
 		const cmd = command + ' ' + args.join(' ');
 		const p = cp.exec(cmd, { cwd: cwd, env: process.env });
