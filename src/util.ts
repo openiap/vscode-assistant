@@ -6,6 +6,7 @@ import { Uri } from 'vscode';
 import * as cp from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
+const JSON5 = require('json5')
 
 export function get(url: string): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -124,6 +125,34 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 	return new Promise<string>(async (resolve, reject) => {
 		var client = new openiap(apiurl, jwt);
 		try {
+			let localproject: any = {};
+			if (fs.existsSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json') == true) {
+				var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', 'utf8');
+				localproject = JSON5.parse(json);
+				if(localproject.name == null || localproject.name == "") {
+					vscode.window.showErrorMessage('No name found in package.json');
+					return "";
+				}
+				if(localproject.name.indexOf("\\") > 0) {
+					vscode.window.showErrorMessage('Name in project.json cannot contain \\');
+					return "";
+				}
+				if(localproject.main == null || localproject.main == "") {
+					vscode.window.showErrorMessage('No main found in package.json');
+					return "";
+				}
+				if(localproject.openiap == null) {
+					vscode.window.showErrorMessage('No openiap section found in package.json');
+					return "";
+				}
+				if(localproject.openiap.language == null || localproject.openiap.language == "") {
+					vscode.window.showErrorMessage('No language found in openiap section of package.json');
+					return "";
+				}
+			} else {
+				vscode.window.showErrorMessage('No package.json found in workspace please run init openiap project first (initproject)');
+				return "";
+			}
 			await client.connect();
 			var projects = await client.Query<any>({ collectionname: "agents", query: { "_type": "package", "id": project.name } });
 			var pro = {
@@ -132,7 +161,7 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 				description: project.description,
 				version: project.version,
 				fileid: "",
-				language: "nodejs",
+				language: localproject.openiap.language,
 				daemon: false,
 				chrome: false,
 				chromium: false,
@@ -141,29 +170,6 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 			};
 			// @ts-ignore
 			delete pro.port;
-
-			if (project.main != null) {
-				if (project.main.endsWith(".js") || project.main.endsWith(".ts")) {
-					pro.language = "nodejs";
-				} else if (project.main.endsWith(".py")) {
-					pro.language = "python";
-				} else if (project.main.endsWith(".cs") || project.main.endsWith(".vb") || project.main.endsWith(".csproj") || project.main.endsWith(".vbproj")) {
-					pro.language = "dotnet";
-				} else if (project.main.endsWith(".ps1")) {
-					pro.language = "powershell";
-				}
-			} else {
-				// search vscode.workspace for csproj or vbproj file
-				var files = await vscode.workspace.findFiles("**/*.csproj", "**/node_modules/**");
-				if (files.length > 0) {
-					pro.language = "dotnet";
-				} else {
-					files = await vscode.workspace.findFiles("**/*.vbproj", "**/node_modules/**");
-					if (files.length > 0) {
-						pro.language = "dotnet";
-					}
-				}
-			}
 			if (projects == null || projects.length == 0) {
 				pro = await client.InsertOne({ collectionname: "agents", item: pro });
 			} else {

@@ -243,7 +243,7 @@ async function pack(): Promise<string> {
             var json = fs.readFileSync(vscode.workspace.workspaceFolders?.[0].uri.fsPath + '/package.json', 'utf8');
             project = JSON5.parse(json);
         } else {
-            vscode.window.showErrorMessage('No package.json found in workspace please run npm init first');
+            vscode.window.showErrorMessage('No package.json found in workspace please run init openiap project first (initproject)');
             return "";
         }
         if (project.name == undefined) {
