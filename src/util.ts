@@ -178,7 +178,8 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 				chrome: false,
 				chromium: false,
 				ports: [{ "port": 3000, "name": "web", "protocol": "TCP", "web": true }],
-				author: project.author, main: project.main, _type: "package"
+				author: project.author, main: project.main, _type: "package",
+				openiap: project.openiap
 			};
 			// @ts-ignore
 			delete pro.port;
@@ -193,6 +194,10 @@ export function UploadPackage(apiurl: string, filename: string, project: any, jw
 				pro.id = project.name;
 				pro.description = project.description;
 				pro.version = project.version;
+				pro.language = localproject.openiap.language;
+				pro.main = project.main;
+				pro.author = project.author;
+				pro.openiap = project.openiap;
 				if (project != null && project.openiap != null) {
 					if (project.openiap.daemon == true || project.openiap.daemon == "true") {
 						pro.daemon = true;

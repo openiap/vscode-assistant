@@ -323,7 +323,11 @@ var exampleconfig = {
         "dotnet",
         "rust",
         "php",
-        "java"
+        "java",
+        "c", 
+        "binary",
+        "powershell",
+        "shell"
     ],
     "repositories": [
         {
@@ -331,6 +335,11 @@ var exampleconfig = {
             "description": "Node.js example for most SDK commands",
             "url": "https://github.com/skadefro/nodetest.git"
         },
+        {
+            "name": "nodejs",
+            "description": "Node.js template for processing workitems",
+            "url": "https://github.com/skadefro/nodeworkitemagent.git"
+        },        
         {
             "name": "java",
             "description": "Java example for most SDK commands",
@@ -341,6 +350,11 @@ var exampleconfig = {
             "description": "Python example for most SDK commands",
             "url": "https://github.com/skadefro/pythontest.git"
         },
+        {
+            "name": "python",
+            "description": "Python template for processing workitems",
+            "url": "https://github.com/openiap/pythonworkitemagent.git"
+        },        
         {
             "name": "dotnet",
             "description": "C# example for most SDK commands",
@@ -354,6 +368,16 @@ var exampleconfig = {
         {
             "name": "rust",
             "description": "Rust example with a small CLI for calling some SDK commands",
+            "url": "https://github.com/skadefro/rusttest.git"
+        },
+        {
+            "name": "c",
+            "description": "C example for most SDK commands",
+            "url": "https://github.com/skadefro/ctest.git"
+        },
+        {
+            "name": "binary",
+            "description": "Example project for calling a binary on an agent",
             "url": "https://github.com/skadefro/rusttest.git"
         },
         {
@@ -380,16 +404,25 @@ var exampleconfig = {
             "name": "python",
             "description": "Workitem queue agent example",
             "url": "https://github.com/openiap/pythontest"
+        },
+        {
+            "name": "powershell",
+            "description": "Example agent, process a single workitem when linked to a workitem queue",
+            "url": "https://github.com/openiap/powershellagent.git"
+        },
+        {
+            "name": "shell",
+            "description": "Example agent, process a single workitem when linked to a workitem queue",
+            "url": "https://github.com/openiap/shellagent.git"
         }
-    ]
+    ]    
 }
-var exampleconfigupdated = false;
-export async function userSelectLanguage(): Promise<string | null> {
+
+export async function refreshRepositories() {
     try {
         // Fetch https://raw.githubusercontent.com/openiap/openiap-assistant-repos/refs/heads/main/repositories.json if possible
         // if not possible, use exampleconfig
         // if not possible, use hardcoded example
-
         if (exampleconfigupdated == false) { // only fetch once
             exampleconfigupdated = true;
             try {
@@ -401,6 +434,13 @@ export async function userSelectLanguage(): Promise<string | null> {
                 exampleconfigupdated = true;
             }
         }
+
+    } catch (error: any) {
+    }
+}
+var exampleconfigupdated = false;
+export async function userSelectLanguage(): Promise<string | null> {
+    try {
         if (exampleconfig.languages.length > 1) {
             var labels = exampleconfig.languages.map(x => { return { label: x } });
             const input = vscode.window.createQuickPick();
@@ -429,17 +469,6 @@ export async function userSelectLanguageProject(): Promise<string | null> {
     return new Promise<string | null>((resolve, reject) => {
         MultiStepInput.run(async input => {
             try {
-                if (exampleconfigupdated == false) { // only fetch once
-                    exampleconfigupdated = true;
-                    try {
-                        var json = await get("https://raw.githubusercontent.com/openiap/openiap-assistant-repos/refs/heads/main/repositories.json");
-                        if (json != null && json != "") {
-                            exampleconfig = JSON.parse(json);
-                        }
-                    } catch (error) {
-                        exampleconfigupdated = true;
-                    }
-                }
                 const languages = exampleconfig.languages.map(x => { return { label: x } });
                 const language = await input.showQuickPick({
                     title: "Select project language",

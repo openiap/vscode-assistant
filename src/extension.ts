@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { addflowconfig, deleteflowconfig, flowCrendentials, initproject, initprojectforce, packproject, pushproject } from './flowconfig';
+import { addflowconfig, deleteflowconfig, flowCrendentials, initproject, initprojectforce, packproject, pushproject, refreshRepositories } from './flowconfig';
 
 export function activate(context: vscode.ExtensionContext) {
 	var credentials: flowCrendentials[] = [];
@@ -32,5 +32,11 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable);
 	disposable = vscode.commands.registerCommand('openiap.initprojectforce', initprojectforce);
 	context.subscriptions.push(disposable);
+
+	try {
+		refreshRepositories();
+	} catch (error) {
+		
+	}
 }
 export function deactivate() { }
