@@ -19,7 +19,7 @@
 ## [0.0.26]
  - fix executing when command path contain spaces
 ## [0.0.25]
- - fix python detection with no project.json
+ - fix python detection with no package.json
 ## [0.0.24]
  - Fix issue with findinpath function
 ## [0.0.23]
@@ -27,7 +27,7 @@
 ## [0.0.22]
  - Always add requirements when init empty workspace
 ## [0.0.21]
- - Add port support in project.json/openiap
+ - Add port support in package.json/openiap
 ## [0.0.20]
  - on init in emtpy project, detect if npm and python installed before adding examples
  - on init in emtpy project, also run pip install if python example was added
@@ -44,7 +44,7 @@
  - Improve launch.json generation
 
 ## [0.0.15]
- - Fix error with always updating project.json name
+ - Fix error with always updating package.json name
 
 ## [0.0.14]
 - Add option to create/update package.json and launch.json
