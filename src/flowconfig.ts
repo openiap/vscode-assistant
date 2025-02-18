@@ -338,7 +338,7 @@ var exampleconfig = {
         {
             "name": "nodejs",
             "description": "Node.js template for processing workitems",
-            "url": "https://github.com/skadefro/nodeworkitemagent.git"
+            "url": "https://github.com/openiap/nodeworkitemagent.git"
         },        
         {
             "name": "java",

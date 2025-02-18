@@ -1,5 +1,7 @@
 # Change Log
 
+## [0.0.39]
+ - Update default repos
 ## [0.0.38]
  - make publish less restrictive (allow changing language, author and any openiap settings)
  - load repos at start, and update default repo list
