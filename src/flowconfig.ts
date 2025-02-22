@@ -315,6 +315,7 @@ export async function userSelectConfiguration(): Promise<flowCrendentials | null
         return null;
     }
 }
+var exampleconfigupdated = false;
 var exampleconfig = {
     "languages": [
         "nodejs",
@@ -332,14 +333,14 @@ var exampleconfig = {
     "repositories": [
         {
             "name": "nodejs",
-            "description": "Node.js example for most SDK commands",
-            "url": "https://github.com/skadefro/nodetest.git"
-        },
-        {
-            "name": "nodejs",
             "description": "Node.js template for processing workitems",
             "url": "https://github.com/openiap/nodeworkitemagent.git"
         },        
+        {
+            "name": "nodejs",
+            "description": "Node.js example for most SDK commands",
+            "url": "https://github.com/skadefro/nodetest.git"
+        },
         {
             "name": "java",
             "description": "Java example for most SDK commands",
@@ -347,13 +348,18 @@ var exampleconfig = {
         },
         {
             "name": "python",
+            "description": "Python template for processing workitems",
+            "url": "https://github.com/openiap/pythonworkitemagent.git"
+        },        
+        {
+            "name": "python",
             "description": "Python example for most SDK commands",
             "url": "https://github.com/skadefro/pythontest.git"
         },
         {
-            "name": "python",
-            "description": "Python template for processing workitems",
-            "url": "https://github.com/openiap/pythonworkitemagent.git"
+            "name": "dotnet",
+            "description": "C# template for processing workitems",
+            "url": "https://github.com/openiap/dotnetworkitemagent.git"
         },        
         {
             "name": "dotnet",
@@ -401,11 +407,6 @@ var exampleconfig = {
             "url": "https://github.com/openiap/core-web-arch.git"
         },
         {
-            "name": "python",
-            "description": "Workitem queue agent example",
-            "url": "https://github.com/openiap/pythontest"
-        },
-        {
             "name": "powershell",
             "description": "Example agent, process a single workitem when linked to a workitem queue",
             "url": "https://github.com/openiap/powershellagent.git"
@@ -417,7 +418,6 @@ var exampleconfig = {
         }
     ]    
 }
-
 export async function refreshRepositories() {
     try {
         // Fetch https://raw.githubusercontent.com/openiap/openiap-assistant-repos/refs/heads/main/repositories.json if possible
@@ -438,7 +438,6 @@ export async function refreshRepositories() {
     } catch (error: any) {
     }
 }
-var exampleconfigupdated = false;
 export async function userSelectLanguage(): Promise<string | null> {
     try {
         if (exampleconfig.languages.length > 1) {
@@ -557,10 +556,15 @@ export async function _setupProjectRepository(credentials: flowCrendentials | nu
                     return;
                 }
             }
+            let envfile = "";
             const repo = await userSelectLanguageProject();
             if (repo == null) return;
             if (_files.length > 0 && forced) {
                 for (var i = 0; i < _files.length; i++) {
+                    const filename = _files[i];
+                    if (filename == '.env') {
+                        envfile = fs.readFileSync(path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath as string, _files[i]), 'utf8');
+                    }
                     fs.rmSync(path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath as string, _files[i]), { recursive: true, force: true });
                 }
             }
@@ -570,6 +574,9 @@ export async function _setupProjectRepository(credentials: flowCrendentials | nu
             const gitFolder = path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath as string, '.git');
             if (fs.existsSync(gitFolder)) {
                 fs.rmSync(gitFolder, { recursive: true, force: true });
+            }
+            if(envfile != ""){
+                fs.writeFileSync(path.join(vscode.workspace.workspaceFolders?.[0].uri.fsPath as string, '.env'), envfile);
             }
         }
     } catch (error: any) {

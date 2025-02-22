@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.0.40]
+ - Update default repos, fix order
+ - Preserve .env file when force re-initilizing project
 ## [0.0.39]
  - Update default repos
 ## [0.0.38]
